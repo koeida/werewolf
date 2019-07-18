@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 import curses
 from math import sqrt
 
@@ -6,11 +6,41 @@ MAP_WIDTH = 100
 MAP_HEIGHT = 30
 
 news = []
-i_junks = [ "a shelf of ancient tombs,oh how old"
+i_junks = [ "a shelf of ancient tomes,oh how old"
           , "a comfy sofa, should I sit down?"
           , "a desk. very desky."
-          , "a pile of rubble. what happened here?"  
+          , "a pile of rubble. what happened here?"
+          , "dirty laundry. oh, it reeks"
           ]
+
+o_junks = [ "a pile of rubble. what happened here?"
+          , "a hay bale. where's the needle?"
+          , "a campfire.  nice and toasty!"
+          , "a mail box. stuffed with bills:("
+          , "a mail box. stuffed with love letters:)"
+          ]
+
+tiles = {0: (".",0),
+         1: ("#",2),
+         2: ("\"",3),
+         3: ("_",1)}
+
+def gen_objects(m):
+    objects = []
+    for x in range(5):
+        r1 = randint(1,MAP_WIDTH)
+        r2 = randint(1,MAP_HEIGHT)
+        tile_num = m[r2][r1]
+        tile = tiles[tile_num]        
+        tile_icon = tile[0]
+        
+        if if_outdoors(tile_icon):            
+            junklist = o_junks            
+        else:            
+            junklist = i_junks
+        junk = Object(r1,r2, "?", choice(junklist))
+        objects.append(junk)
+    return objects
 
 def distance(c1,c2):
     a = c1.x - c2.x      
@@ -27,6 +57,7 @@ class Creature:
         self.color = color
         self.mode = mode
         self.flee_timer = 4
+        self.inventory = []
         
 class Object:
     def __init__(self, x, y, icon, description = ""):
@@ -150,6 +181,11 @@ def keyboard_input(inp, player, m, cs, objects):
     if m[player.y][player.x] == 1:
         player.x = oldx
         player.y = oldy
+    for c in filter(lambda o: o.icon == "$",objects):
+        if player.x == c.x and player.y == c.y:
+            player.inventory.append(c)
+            news.append("you collected a coin")
+            objects.remove(c)
     
     vs = filter(lambda c: c.icon == "v", cs)
     for v in vs:
@@ -158,6 +194,9 @@ def keyboard_input(inp, player, m, cs, objects):
             cs.remove(v)
             body = Object(v.x, v.y, "%", "A dead villager. Eeeewwww.")
             objects.append(body)
+            for x in range(2):
+                coin = Object(randint(1,MAP_WIDTH),randint(1,MAP_HEIGHT),"$","oooh, a coin")
+                objects.append(coin) 
             
                    
 def display_news(screen, news):
@@ -261,7 +300,11 @@ def make_building(w,h):
                 results[row][column] = 3
                 return results
     return results
+
     
-   
+def if_outdoors(tile):
+    if tile == "\"":
+        return True
+    return False
 #for row in make_building(randint(4,15),randint(4,15)):
 #    print(row)
