@@ -2,14 +2,9 @@ import curses
 from wlib import *
 from random import randint, choice
 
-m = [[2 for x in range(MAP_WIDTH)] for y in range(MAP_HEIGHT)]
+from display import *
 
-def draw_map(screen, tiles, m):
-    for row in range(len(m)):
-        for column in range(len(m[0])):
-            cur_tile_num = m[row][column]
-            cur_tile = tiles[cur_tile_num][0]
-            screen.addstr(row, column, cur_tile, curses.color_pair(tiles[cur_tile_num][1]))
+m = [[2 for x in range(MAP_WIDTH)] for y in range(MAP_HEIGHT)]
 
 def main(screen):
     inp = 0 
@@ -38,8 +33,8 @@ def main(screen):
         draw_map(screen, tiles, m)
         
         for o in objects:
-            screen.addstr(o.y, o.x, o.icon, curses.color_pair(1))
-        
+            screen.addstr(o.y, o.x, o.icon,curses.color_pair(o.color))
+            
         for c in cs:
             if c.icon == "v":
                 move_villager(c,player,m,cs,objects)
