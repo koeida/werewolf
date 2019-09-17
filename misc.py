@@ -11,3 +11,10 @@ def between(i1,i2,l):
     else:
         return l[i2:i1]
     
+def optupe(t):
+    v1, v2 = t
+    v1 *= -1
+    v2 *= -1
+    return (v1,v2)
+
+    

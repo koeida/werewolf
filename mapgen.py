@@ -19,13 +19,24 @@ o_junks = [ "a pile of rubble. what happened here?"
           , "a mail box. stuffed with love letters:)"
           ]
 
+potions = [ "a healing potion"
+          , "a speed potion"
+          , "an invisibilaty potion"
+          ]
+
 def gen_objects(m):
     objects = []
+    for x in range(5):
+        px = randint(1, MAP_WIDTH - 1)
+        py = randint(1, MAP_HEIGHT - 1)
+        p = choice(potions)
+        potion = wlib.Object(px, py, "8", 13, p, p)
+        objects.append(potion)
     for x in range(20):
         r1 = randint(1,MAP_WIDTH - 1)
         r2 = randint(1,MAP_HEIGHT - 1)
         tile_num = m[r2][r1]
-        tile = display.tiles[tile_num]        
+        tile = display.tiles[tile_num]
         tile_icon = tile[0]
         
         if if_outdoors(tile_icon):            
@@ -107,3 +118,12 @@ def if_outdoors(tile):
 def on_map(x,y,m):
     """Returns True if x,y is within map m"""
     return (x > 0 and x < len(m[0]) and y > 0 and y < len(m))
+
+def random_building():
+    building_x = randint(2,MAP_WIDTH)
+    building_y = randint(2,MAP_HEIGHT)
+    building_width = randint(4,15)
+    building_height = randint(4,15)
+    building = make_building(building_width, building_height)
+    return (building_x, building_y, building)
+

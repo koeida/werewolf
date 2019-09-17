@@ -6,24 +6,32 @@ from display import *
 
 m = [[2 for x in range(MAP_WIDTH)] for y in range(MAP_HEIGHT)]
 
+
+
 def main(screen):
     inp = 0 
     curses.curs_set(False) # Disable blinking cursor
     init_colors()
-    player = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "w", 1)
+    player = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "w", 1, 3)
     cs = [player]
     
     news.append("WELCOME TO WEREWOLF")
 
     for x in range(10):
-        villager = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "v", 5, "wander")
+        villager = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "v", 5, mode="wander")
         cs.append(villager)
+        
+    for x in range(5):
+        guard = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "g", 5, mode="wander")
+        cs.append(guard)
         
     for x in range(35):
         (building_x, building_y, building) = random_building()
         stamp_building(building_x, building_y, building, m)        
     
     objects = gen_objects(m)
+    coin = Object(randint(1, MAP_WIDTH), randint(1, MAP_HEIGHT), "$", 11, "a coin", "oooh, a coin")
+    player.inventory.append(coin)
     
     while(inp != 113): # Quit game if player presses "q"
         screen.clear()
@@ -38,17 +46,20 @@ def main(screen):
         for c in cs:
             if c.icon == "v":
                 move_villager(c,player,m,cs,objects)
+            elif c.icon == "g":
+                move_guard(c,player,m,cs,objects)
+                
+        if player.hp == 0:
+            return
+        # display callz
+        for c in cs:
             screen.addstr(c.y, c.x, c.icon, curses.color_pair(c.color))
             
         display_news(screen, news)
         
-        #display inv
-        screen.addstr(0, MAP_WIDTH + 1, "Inventory:")
-        ci = 1
-        for i in player.inventory:
-            screen.addstr(ci, MAP_WIDTH + 1, i.icon, 0)
-            ci += 1
-            
+        display_inv(screen, player.inventory)
+        
+        display_hp(screen, player.hp)            
             
         screen.refresh()
 
