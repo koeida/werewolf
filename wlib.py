@@ -8,7 +8,7 @@ from mapgen import *
 news = []
 
 class Creature:
-    def __init__(self, x, y, icon, color,hp=0,mode=""):
+    def __init__(self, x, y, icon, color, hp=0, mode=""):
         self.x = x
         self.y = y
         self.icon = icon
@@ -17,6 +17,7 @@ class Creature:
         self.timer = 4
         self.inventory = []
         self.hp = hp
+        self.stun_timer = 0
 
 class Object:
     def __init__(self, x, y, icon, color, name = "", description = ""):
@@ -26,6 +27,7 @@ class Object:
         self.description = description
         self.color = color
         self.name = name
+        self.effect = lambda x, y: None
 
 def distance(c1, c2):
     a = c1.x - c2.x      
@@ -148,7 +150,8 @@ def keyboard_input(inp, player, m, cs, objects):
         day_colors()
     elif inp in map(lambda n: ord(str(n)), range(0, 10)):
         selected_number = inp - 49
-        player.inventory.pop(selected_number)
+        cur_inv = player.inventory.pop(selected_number)
+        cur_inv.effect(player, cs)
 
 
         

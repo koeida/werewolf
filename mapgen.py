@@ -19,18 +19,34 @@ o_junks = [ "a pile of rubble. what happened here?"
           , "a mail box. stuffed with love letters:)"
           ]
 
-potions = [ "a healing potion"
-          , "a speed potion"
-          , "an invisibilaty potion"
+
+def healing_potion_effect(player,creatures):
+    player.hp += 2
+    wlib.news.append("you drank a healing potion. glug, glug")
+
+def speed_potion_effect(player,creatures):
+    o = filter(lambda x: x.icon != "w", creatures)
+    for x in o:
+        x.stun_timer = 3
+
+def invisibility_potion_effect(player, creatures):
+    pass
+
+
+potions = [ ("a healing potion", healing_potion_effect)
+          , ("a speed potion", speed_potion_effect)
+          , ("an invisibilaty potion", invisibility_potion_effect)
           ]
 
 def gen_objects(m):
     objects = []
-    for x in range(5):
+    for x in range(50):
         px = randint(1, MAP_WIDTH - 1)
         py = randint(1, MAP_HEIGHT - 1)
-        p = choice(potions)
+        p, effect = choice(potions)
         potion = wlib.Object(px, py, "8", 13, p, p)
+        potion.effect = effect
+
         objects.append(potion)
     for x in range(20):
         r1 = randint(1,MAP_WIDTH - 1)
@@ -43,7 +59,7 @@ def gen_objects(m):
             junklist = o_junks            
         else:            
             junklist = i_junks
-        junk = wlib.Object(r1,r2, "?",10, choice(junklist))
+        junk = wlib.Object(r1,r2, "?",10,choice(junklist), choice(junklist))
         objects.append(junk)
     return objects
 

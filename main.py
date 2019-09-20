@@ -44,11 +44,15 @@ def main(screen):
             screen.addstr(o.y, o.x, o.icon,curses.color_pair(o.color))
             
         for c in cs:
-            if c.icon == "v":
-                move_villager(c,player,m,cs,objects)
-            elif c.icon == "g":
-                move_guard(c,player,m,cs,objects)
-                
+            if c.stun_timer == 0:
+                if c.icon == "v":
+                    move_villager(c,player,m,cs,objects)
+                elif c.icon == "g":
+                    move_guard(c,player,m,cs,objects)
+
+            if c.stun_timer != 0:
+                c.stun_timer -= 1
+
         if player.hp == 0:
             return
         # display callz
