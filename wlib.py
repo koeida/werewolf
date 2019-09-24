@@ -12,12 +12,15 @@ class Creature:
         self.x = x
         self.y = y
         self.icon = icon
+        self.original_color = color
         self.color = color
         self.mode = mode
         self.timer = 4
         self.inventory = []
         self.hp = hp
         self.stun_timer = 0
+        self.invisibility_timer = 0
+        self.target = None
 
 class Object:
     def __init__(self, x, y, icon, color, name = "", description = ""):
@@ -36,14 +39,19 @@ def distance(c1, c2):
     
     return sqrt(c)
 
-
-def can_see(row, start, end, m, objects):   
+def no_wall_between(row, start, end, m):
     inb = between(start, end, m[row])
     
     if 1 in inb:
         return False
     else:
         return True
+
+def can_see(m,c,t):
+    column_visible = c.x == t.x and no_wall_between(t.x, t.y, c.y, rotate_list(m, 3))
+    row_visibile = c.y == t.y and no_wall_between(t.y, t.x, c.x, m)
+    is_invisible = t.invisibility_timer != 0
+    return (column_visible or row_visibile) and not is_invisible
     
 def off_map(nx, ny):
     return nx > (MAP_WIDTH - 1) or ny > (MAP_HEIGHT - 1) or nx < 0 or ny < 0
@@ -95,8 +103,7 @@ def move_villager(v,player,m,cs,objects):
     for o in filter(lambda o: o.icon == "?",objects):
         m[o.y][o.x] = 1
     
-    if (v.x == player.x and can_see(player.x, player.y, v.y, rotate_list(m,3), objects)
-    or (v.y == player.y and can_see(player.y, player.x, v.x, m, objects))):
+    if can_see(m, v, player):
         v.mode = "fleeing"
         v.timer = 4
     
@@ -111,19 +118,17 @@ def move_villager(v,player,m,cs,objects):
     attempt_move(v, m, xmod, ymod,cs,objects)
     
 def move_guard(g,player,m,cs,objects):
-    if (g.x == player.x and can_see(player.x, player.y, g.y, rotate_list(m,3), objects)
-    or (g.y == player.y and can_see(player.y, player.x, g.x, m, objects))):
-        g.mode = "chasing"
-    if g.mode == "wander":
+    if can_see(m, g, player):
+        g.target = (player.x,player.y)
+
+    if g.target is not None:
+        xmod, ymod = optupe(pick_direction(g.x, g.y, g.target[0], g.target[1]))
+    elif g.target is None:
         xmod, ymod = wander(g)
-    elif g.mode == "chasing":        
-        xmod, ymod = optupe(pick_direction(g.x, g.y, player.x, player.y))
-        g.timer -= 1
-        if g.timer == 0:
-            g.mode = "wander"
-            g.timer = 4
-    else:
-        xmod,ymod = (0,0)
+
+    if (g.x, g.y) == g.target:
+        g.target = None
+
     if xmod + g.x == player.x and ymod + g.y == player.y:
         news.append("ya got hit")
         player.hp -= 1
@@ -151,7 +156,7 @@ def keyboard_input(inp, player, m, cs, objects):
     elif inp in map(lambda n: ord(str(n)), range(0, 10)):
         selected_number = inp - 49
         cur_inv = player.inventory.pop(selected_number)
-        cur_inv.effect(player, cs)
+        cur_inv.effect(player, cs,m)
 
 
         

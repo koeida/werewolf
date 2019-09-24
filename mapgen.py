@@ -19,18 +19,25 @@ o_junks = [ "a pile of rubble. what happened here?"
           , "a mail box. stuffed with love letters:)"
           ]
 
+def under_color(c,m):
+    tilenum = m[c.y][c.x]
+    tile = display.tiles[tilenum]
+    u_color = tile[1]
+    return u_color
 
-def healing_potion_effect(player,creatures):
+def healing_potion_effect(player,creatures,m):
     player.hp += 2
     wlib.news.append("you drank a healing potion. glug, glug")
 
-def speed_potion_effect(player,creatures):
+def speed_potion_effect(player,creatures,m):
     o = filter(lambda x: x.icon != "w", creatures)
     for x in o:
         x.stun_timer = 3
+    wlib.news.append("you drank a speed potion. glug, glug")
 
-def invisibility_potion_effect(player, creatures):
-    pass
+def invisibility_potion_effect(player, creatures,m):
+    player.invisibility_timer = 8
+    wlib.news.append("you drank an invisibility potion. glug, glug")
 
 
 potions = [ ("a healing potion", healing_potion_effect)
@@ -40,7 +47,7 @@ potions = [ ("a healing potion", healing_potion_effect)
 
 def gen_objects(m):
     objects = []
-    for x in range(50):
+    for x in range(7):
         px = randint(1, MAP_WIDTH - 1)
         py = randint(1, MAP_HEIGHT - 1)
         p, effect = choice(potions)

@@ -53,6 +53,12 @@ def main(screen):
             if c.stun_timer != 0:
                 c.stun_timer -= 1
 
+            if c.invisibility_timer != 0:
+                c.invisibility_timer -= 1
+                c.color = under_color(c, m)
+            else:
+                c.color = c.original_color
+
         if player.hp == 0:
             return
         # display callz
