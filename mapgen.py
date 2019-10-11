@@ -2,8 +2,14 @@ from random import randint, choice
 import wlib
 import display
 
-MAP_WIDTH = 100
-MAP_HEIGHT = 30
+CAM_WIDTH = 51
+CAM_HEIGHT = 15
+
+MAP_WIDTH = 1000
+MAP_HEIGHT = 1000
+
+NUM_POTIONS = int(MAP_HEIGHT * MAP_WIDTH / 500)
+NUM_JUNKS = int(MAP_HEIGHT * MAP_WIDTH * 0.003)
 
 i_junks = [ "a shelf of ancient tomes,oh how old"
           , "a comfy sofa, should I sit down?"
@@ -47,7 +53,7 @@ potions = [ ("a healing potion", healing_potion_effect)
 
 def gen_objects(m):
     objects = []
-    for x in range(7):
+    for x in range(NUM_POTIONS):
         px = randint(1, MAP_WIDTH - 1)
         py = randint(1, MAP_HEIGHT - 1)
         p, effect = choice(potions)
@@ -55,7 +61,7 @@ def gen_objects(m):
         potion.effect = effect
 
         objects.append(potion)
-    for x in range(20):
+    for x in range(NUM_JUNKS):
         r1 = randint(1,MAP_WIDTH - 1)
         r2 = randint(1,MAP_HEIGHT - 1)
         tile_num = m[r2][r1]

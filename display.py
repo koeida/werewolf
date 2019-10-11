@@ -1,5 +1,5 @@
 import curses
-from mapgen import MAP_HEIGHT, MAP_WIDTH
+from mapgen import MAP_HEIGHT, MAP_WIDTH, CAM_WIDTH, CAM_HEIGHT
 
 tiles = {0: (".",0),
          1: ("#",2),
@@ -12,8 +12,8 @@ def display_news(screen, news):
     top_news.reverse()
     cn = 0
     for n in top_news:
-        screen.addstr(MAP_HEIGHT + cn, 0, " " * MAP_WIDTH, curses.color_pair(5 + cn)), 
-        screen.addstr(MAP_HEIGHT + cn, 0, n, curses.color_pair(5 + cn))
+        screen.addstr(CAM_HEIGHT + cn, 0, " " * CAM_WIDTH, curses.color_pair(5 + cn)), 
+        screen.addstr(CAM_HEIGHT + cn, 0, n, curses.color_pair(5 + cn))
         cn += 1
         
 def limit(foo,limit, bottom=0):
@@ -80,22 +80,26 @@ def init_colors(mod=0):
     curses.init_pair(11, 11, curses.COLOR_BLACK)
     curses.init_pair(12, curses.COLOR_BLUE, curses.COLOR_BLACK)
     
-def draw_map(screen, tiles, m):
-    for row in range(len(m)):
-        for column in range(len(m[0])):
-            cur_tile_num = m[row][column]
-            cur_tile = tiles[cur_tile_num][0]
-            screen.addstr(row, column, cur_tile, curses.color_pair(tiles[cur_tile_num][1]))
+def draw_map(screen, tiles, m, cx, cy):
+    for row in range(CAM_HEIGHT):
+        for column in range(CAM_WIDTH):
+            vcx = column + cx
+            vcy = row + cy
+            if vcx < MAP_WIDTH and vcx >= 0:
+                if vcy  < MAP_HEIGHT and vcy >= 0:
+                    cur_tile_num = m[vcy][vcx]
+                    cur_tile = tiles[cur_tile_num][0]
+                    screen.addstr(row, column, cur_tile, curses.color_pair(tiles[cur_tile_num][1]))
 
 def display_hp(screen, hp):
     s = "+" * hp 
-    screen.addstr(14, MAP_WIDTH + 1, "health: " + s, curses.color_pair(1))
+    screen.addstr(14, CAM_WIDTH + 1, "health: " + s, curses.color_pair(1))
     
 def display_inv(screen, inventory):
-    screen.addstr(0, MAP_WIDTH + 1, "Inventory:")
+    screen.addstr(0, CAM_WIDTH + 1, "Inventory:")
     ci = 1
     for i in inventory:
-        screen.addstr(ci, MAP_WIDTH + 1, str(ci) + ") ", curses.color_pair(0))
-        screen.addstr(ci, MAP_WIDTH + 4, i.icon, curses.color_pair(i.color))
-        screen.addstr(ci, MAP_WIDTH + 5, ": " + i.name, curses.color_pair(0))
+        screen.addstr(ci, CAM_WIDTH + 1, str(ci) + ") ", curses.color_pair(0))
+        screen.addstr(ci, CAM_WIDTH + 4, i.icon, curses.color_pair(i.color))
+        screen.addstr(ci, CAM_WIDTH + 5, ": " + i.name, curses.color_pair(0))
         ci += 1
