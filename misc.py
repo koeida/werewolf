@@ -17,4 +17,7 @@ def optupe(t):
     v2 *= -1
     return (v1,v2)
 
-    
+def ordered(x,y):
+    o1 = x if x < y else y
+    o2 = x if x > y else y
+    return (o1, o2)

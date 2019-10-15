@@ -47,12 +47,27 @@ def no_wall_between(row, start, end, m):
     else:
         return True
 
-def can_see(m,c,t):
-    column_visible = c.x == t.x and no_wall_between(t.x, t.y, c.y, rotate_list(m, 3))
-    row_visibile = c.y == t.y and no_wall_between(t.y, t.x, c.x, m)
-    is_invisible = t.invisibility_timer != 0
-    return (column_visible or row_visibile) and not is_invisible
-    
+def can_see(m, c, t):
+    def is_visible_(m, n1, n2, f):
+
+        open_tiles = [0,2,3,4]
+        #open_tiles = filter(lambda tt: tiles[tt][2], tiles)
+        visible = lambda l: len(set(l) - set(open_tiles)) == 0
+
+        start, end = ordered(n1, n2)
+        tiles_between = [f(n,m) for n in range(start, end + 1)]
+        return visible(tiles_between)
+
+    if distance(c,t) > 30:
+        return False
+
+    if c.x == t.x:
+        return is_visible_(m, c.y, t.y, lambda n,m: m[n][c.x])
+    elif c.y == t.y:
+        return is_visible_(m, c.x, t.x, lambda n,m: m[c.y][n])
+    else:
+        return False
+
 def off_map(nx, ny):
     return nx > (MAP_WIDTH - 1) or ny > (MAP_HEIGHT - 1) or nx < 0 or ny < 0
 
@@ -99,10 +114,7 @@ def pick_direction(cx, cy, px, py):
         
 def move_villager(v,player,m,cs,objects):
     xmod,ymod = (0,0)
-    m = copy.deepcopy(m)
-    for o in filter(lambda o: o.icon == "?",objects):
-        m[o.y][o.x] = 1
-    
+
     if can_see(m, v, player):
         v.mode = "fleeing"
         v.timer = 4
@@ -111,7 +123,6 @@ def move_villager(v,player,m,cs,objects):
         xmod, ymod = pick_direction(v.x, v.y, player.x, player.y)
         v.timer -= 1
         if v.timer == 0:
-            #news.append("grrr")
             v.mode = "wander"
     elif v.mode == "wander":
         xmod, ymod = wander(v)        

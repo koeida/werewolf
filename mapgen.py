@@ -2,7 +2,7 @@ from random import randint, choice
 import wlib
 import display
 
-CAM_WIDTH = 51
+CAM_WIDTH = 50
 CAM_HEIGHT = 15
 
 MAP_WIDTH = 1000

@@ -21,7 +21,7 @@ def main(screen):
     
     news.append("WELCOME TO WEREWOLF")
 
-    for x in range(10):
+    for x in range(100): #10
         villager = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "v", 5, mode="wander")
         cs.append(villager)
         
@@ -41,10 +41,11 @@ def main(screen):
     while(inp != 113): # Quit game if player presses "q"
         screen.clear()
         
-        cam_y = player.y - int(CAM_HEIGHT /2)
-        cam_x = player.x - int(CAM_WIDTH / 2)
         
         keyboard_input(inp, player, m, cs, objects)
+
+        cam_y = player.y - int(CAM_HEIGHT / 2)
+        cam_x = player.x - int(CAM_WIDTH / 2) 
         
         draw_map(screen, tiles, m, cam_x, cam_y)
         
@@ -55,11 +56,9 @@ def main(screen):
         for c in cs:
             if c.stun_timer == 0:
                 if c.icon == "v":
-                    pass
-                    #move_villager(c,player,m,cs,objects)
+                    move_villager(c,player,m,cs,objects)
                 elif c.icon == "g":
-                    pass
-                    #move_guard(c,player,m,cs,objects)
+                    move_guard(c,player,m,cs,objects)
 
             if c.stun_timer != 0:
                 c.stun_timer -= 1
