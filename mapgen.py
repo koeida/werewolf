@@ -7,9 +7,10 @@ CAM_HEIGHT = 15
 
 MAP_WIDTH = 1000
 MAP_HEIGHT = 1000
+MAP_AREA = MAP_WIDTH * MAP_HEIGHT
 
-NUM_POTIONS = int(MAP_HEIGHT * MAP_WIDTH / 500)
-NUM_JUNKS = int(MAP_HEIGHT * MAP_WIDTH * 0.003)
+NUM_POTIONS = int(MAP_AREA / 500)
+NUM_JUNKS = int(MAP_AREA * 0.003)
 
 i_junks = [ "a shelf of ancient tomes,oh how old"
           , "a comfy sofa, should I sit down?"

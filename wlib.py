@@ -46,10 +46,38 @@ def no_wall_between(row, start, end, m):
         return False
     else:
         return True
+        
+def no_objects_between(c, t, os, on_x=False, on_y=False):
+    startx, endx = ordered(c.x, t.x)
+    starty, endy = ordered(c.y, t.y)
+    js = list(filter(lambda x: x.icon == "?", os))
+    jsx = list(filter(lambda j: j.x > startx and j.x < endx and j.y == c.y, js))
+    jsy = list(filter(lambda j: j.y > starty and j.y < endy and j.x == c.x , js))
+    if jsx == [] and on_y:
+        return True
+    if jsy == [] and on_x:
+        return True
+    return False
+# |--------tests----------|  
+test_c = Creature(5, 2, "", 0)
+test_t = Creature(5, 10, "", 0) 
+test_os = []
+assert(no_objects_between(test_c, test_t, test_os, True, False) == True)
+  
+test_c = Creature(5, 2, "", 0)
+test_t = Creature(5, 10, "", 0) 
+test_os = [Object(5, 5, "?", 0)]
+assert(no_objects_between(test_c, test_t, test_os, True, False) == False)
 
-def can_see(m, c, t):
+test_c = Creature(5, 2, "", 0)
+test_t = Creature(5, 90, "", 0) 
+test_os = [Object(8, 5, "?", 0)]
+assert(no_objects_between(test_c, test_t, test_os, True, False) == True)
+# ________________________|
+
+def can_see(m, c, t ,os):
     def is_visible_(m, n1, n2, f):
-
+    
         open_tiles = [0,2,3,4]
         #open_tiles = filter(lambda tt: tiles[tt][2], tiles)
         visible = lambda l: len(set(l) - set(open_tiles)) == 0
@@ -58,13 +86,14 @@ def can_see(m, c, t):
         tiles_between = [f(n,m) for n in range(start, end + 1)]
         return visible(tiles_between)
 
-    if distance(c,t) > 30:
+    if distance(c,t) > 50:
         return False
-
-    if c.x == t.x:
-        return is_visible_(m, c.y, t.y, lambda n,m: m[n][c.x])
-    elif c.y == t.y:
-        return is_visible_(m, c.x, t.x, lambda n,m: m[c.y][n])
+    
+    if t.invisibility_timer == 0:
+        if c.x == t.x:
+            return is_visible_(m, c.y, t.y, lambda n,m: m[n][c.x]) and no_objects_between(c,t,os,on_x=True)
+        elif c.y == t.y:
+            return is_visible_(m, c.x, t.x, lambda n,m: m[c.y][n]) and no_objects_between(c,t,os,on_y=True)
     else:
         return False
 
@@ -85,10 +114,26 @@ def attempt_move(c, m, xmod, ymod, cs,objects):
             return
     else:
         if m[ny][nx] == 1:
-            return
+            if c.icon != "w":
+                if ymod == 0:
+                    ymod = randint(-1, 1)
+                    xmod = 0
+                elif xmod == 0:
+                    xmod = randint(-1, 1)
+                    ymod = 0
+            else:
+                return
         for o in objects:
             if o.x == nx and o.y == ny and o.icon == "?":
-                return
+                if c.icon != "w":
+                    if ymod == 0:
+                        ymode = randint(-1, 1)
+                        xmod = 0 
+                    elif xmod == 0:
+                        xmod = randint(-1, 1)
+                        ymod = 0
+                else:
+                    return
         c.x += xmod
         c.y += ymod
       
@@ -115,7 +160,7 @@ def pick_direction(cx, cy, px, py):
 def move_villager(v,player,m,cs,objects):
     xmod,ymod = (0,0)
 
-    if can_see(m, v, player):
+    if can_see(m, v, player,objects):
         v.mode = "fleeing"
         v.timer = 4
     
@@ -129,7 +174,7 @@ def move_villager(v,player,m,cs,objects):
     attempt_move(v, m, xmod, ymod,cs,objects)
     
 def move_guard(g,player,m,cs,objects):
-    if can_see(m, g, player):
+    if can_see(m, g, player,objects):
         g.target = (player.x,player.y)
 
     if g.target is not None:
@@ -157,7 +202,7 @@ def keyboard_input(inp, player, m, cs, objects):
         xmod = -1
     elif inp == curses.KEY_RIGHT:        
         xmod = 1
-    elif inp == curses.KEY_BACKSPACE:        
+    elif inp == curses.KEY_END:        
         for o in objects:
             if int(distance(player,o)) == 1:
                 news.append(o.description)
@@ -186,6 +231,8 @@ def keyboard_input(inp, player, m, cs, objects):
             body = Object(v.x, v.y, "%", 1, "A dead villager. Eeeewwww.")
             objects.append(body)
             for x in range(2):
+                guard = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "g", 5, mode="wander")
+                cs.append(guard)
                 coin = Object(randint(1,MAP_WIDTH),randint(1,MAP_HEIGHT),"$",11, "a coin", "oooh, a coin")
                 objects.append(coin)
 

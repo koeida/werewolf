@@ -21,11 +21,11 @@ def main(screen):
     
     news.append("WELCOME TO WEREWOLF")
 
-    for x in range(100): #10
+    for x in range(int(MAP_AREA * 0.002) ): #10
         villager = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "v", 5, mode="wander")
         cs.append(villager)
         
-    for x in range(5):
+    for x in range(int(MAP_AREA * 0.0006)):
         guard = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "g", 5, mode="wander")
         cs.append(guard)
         
@@ -52,9 +52,9 @@ def main(screen):
         for o in objects:
             if on_cam(o, cam_x, cam_y):
                 screen.addstr(o.y - cam_y, o.x - cam_x , o.icon,curses.color_pair(o.color))
-            
+           
         for c in cs:
-            if c.stun_timer == 0:
+            if c.stun_timer == 0 and distance(c, player) <= 100:
                 if c.icon == "v":
                     move_villager(c,player,m,cs,objects)
                 elif c.icon == "g":
