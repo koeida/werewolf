@@ -38,17 +38,9 @@ def forest(m, startx, starty , endx, endy):
         m[randint(starty, endy)][randint(startx, endx)] = 8
  
 def mountains(m, startx, starty , endx, endy):
-    for y in range(starty,endy):
-        for x in range(startx, endx):
-            m[y][x] = 6
-    
     test_dig = [[6 for x in range(endx - startx)] for y in range(endy - starty)]
-    gd = good_dig(test_dig) #dig(300,300, 6, 5, 2, 2, test_dig, 2, 500)
-    #dig(30,7, "#", " ", 1, 1, test_dig, 2, 1500)
-    #dig(300,300, 6, 5, 2, 10, test_dig, 2, 500)
+    gd = good_dig() 
     stamp(startx,starty,gd,m)
-    #for s in range(30000):
-    #    m[randint(starty, endy)][randint(startx, endx)] = randint(5, 7)
         
 class Digger:
     pass
@@ -138,8 +130,9 @@ def dig(sx, sy, edible, eaten, death_rate, s_spawn_rate, m, speed, stop_count):
 def good_dig(edible=6, eaten=7):
     while(True):
         test_dig = [[edible for x in range(333)] for y in range(333)]
+
         width, height = w_h(test_dig)
-        dig(0, int(height / 25), edible, eaten, 50, 50, test_dig, 2, 1500)
+        dig(width, int(height - 25), edible, eaten, 50, 50, test_dig, 2, 1500)
         if edge_touch(test_dig, edible, eaten) >= 2:# and rate_dig(test_dig) <= width * height * 0.5:
             return test_dig
     
@@ -175,16 +168,16 @@ def building_zone(m, startx, starty , endx, endy, building_divider, minwidth, mi
             stamp_building(building_x, building_y, building, m)
 
 
-zones = shuffled([
+zones = [
+    Zone("mountains", 0.0001, 0.0001, 0.003, mountains),
     Zone("factory", 0.0015, 0.0006, 0.002, factory),
     Zone("village", 0.003, 0.0005, 0.001, village),
     Zone("plains", 0.002, 0.0003, 0.001, plains),
     Zone("forest", 0.00015, 0.00015, 0.004, forest),
     Zone("village", 0.003, 0.0005, 0.001, village),
-    Zone("mountains", 0.0001, 0.0001, 0.003, mountains),
     Zone("forest", 0.00015, 0.00015, 0.004, forest),
     Zone("lake", 0.0002, 0.0001, 0,village),
-    Zone("plains", 0.002, 0.0003, 0.001, plains)])
+    Zone("plains", 0.002, 0.0003, 0.001, plains)]
     
 def build_world(zones, m):
     cur_y = 0

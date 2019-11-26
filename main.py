@@ -6,7 +6,6 @@ from display import *
 from mapgen import village, gen_objects, build_world
 import mapgen
 
-m = [[2 for x in range(MAP_WIDTH)] for y in range(MAP_HEIGHT)]
 
 def on_cam(t, cam_x, cam_y):
     if t.x < cam_x + CAM_WIDTH and t.y < cam_y + CAM_HEIGHT:
@@ -15,6 +14,8 @@ def on_cam(t, cam_x, cam_y):
     return False
     
 def make_world():
+    m = [[2 for x in range(MAP_WIDTH)] for y in range(MAP_HEIGHT)]
+
     player = Creature(333, 333, "w", 1, 3)
     cs = [player]
     
@@ -31,6 +32,12 @@ def make_world():
     #factory(m, 2, 2, 80, 80)
     #village(m, 82 ,2 ,162 ,80)
     build_world(mapgen.zones, m)
+
+    for row in m:
+        for x in row:
+            if x not in range(0,10):
+                print(x)
+                exit()
 
     objects = gen_objects(m)
     coin = Object(randint(1, MAP_WIDTH), randint(1, MAP_HEIGHT), "$", 11, "a coin", "oooh, a coin")
@@ -94,4 +101,4 @@ def main(screen, world):
 
         
 world = make_world()
-curses.wrapper(main, m)
+curses.wrapper(main, world)
