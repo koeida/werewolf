@@ -1,12 +1,18 @@
 import curses
 from mapgen import MAP_HEIGHT, MAP_WIDTH, CAM_WIDTH, CAM_HEIGHT
+from random import randint
 
 tiles = {0: (".",0),
          1: ("#",2),
          2: ("\"",3),
          3: ("_",1),
-         4: ("~",12)}
-
+         4: ("~",12),
+         5: ("@",9),
+         6: ("O",7),
+         7: ("o",8),
+         8: ("o",2),
+         9: ("*",14)}
+         
 def display_news(screen, news):
     top_news = news[-5:]
     top_news.reverse()
@@ -39,13 +45,15 @@ def night_colors():
     winit_color(4, 600, 400, 255)
     winit_color(5, 800, 800, 800)
     winit_color(13, 600, 180, 670)
+    winit_color(14,800, 0, 0)
     
-    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(1, 2, curses.COLOR_BLACK)
     curses.init_pair(2, 2, curses.COLOR_BLACK )
     curses.init_pair(3, 3, curses.COLOR_BLACK ) 
     curses.init_pair(4, 4, curses.COLOR_BLACK)
     curses.init_pair(5, 5, curses.COLOR_BLACK)
     curses.init_pair(13, 13, curses.COLOR_BLACK)
+    curses.init_pair(14, 14, curses.COLOR_BLACK)
 
 def day_colors():
     winit_color(2, 600, 400, 255)

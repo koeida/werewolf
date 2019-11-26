@@ -42,10 +42,11 @@ def distance(c1, c2):
 def no_wall_between(row, start, end, m):
     inb = between(start, end, m[row])
     
-    if 1 in inb:
+    if 1 or 6 or 8 in inb:
         return False
     else:
         return True
+        
         
 def no_objects_between(c, t, os, on_x=False, on_y=False):
     startx, endx = ordered(c.x, t.x)
@@ -113,27 +114,21 @@ def attempt_move(c, m, xmod, ymod, cs,objects):
         elif c.icon == "p":
             return
     else:
-        if m[ny][nx] == 1:
+        if m[ny][nx] in(1, 6, 8) :
             if c.icon != "w":
-                if ymod == 0:
-                    ymod = randint(-1, 1)
-                    xmod = 0
-                elif xmod == 0:
-                    xmod = randint(-1, 1)
-                    ymod = 0
+                xmod, ymod = get_new_mods(xmod, ymod)
             else:
                 return
+            attempt_move(c, m, xmod, ymod, cs, objects)
+            return
         for o in objects:
             if o.x == nx and o.y == ny and o.icon == "?":
                 if c.icon != "w":
-                    if ymod == 0:
-                        ymode = randint(-1, 1)
-                        xmod = 0 
-                    elif xmod == 0:
-                        xmod = randint(-1, 1)
-                        ymod = 0
+                    xmod, ymod = get_new_mods(xmod, ymod)
                 else:
                     return
+                attempt_move(c, m, xmod, ymod, cs, objects)
+                return
         c.x += xmod
         c.y += ymod
       
@@ -194,14 +189,15 @@ def move_guard(g,player,m,cs,objects):
         
 def keyboard_input(inp, player, m, cs, objects):
     ymod = xmod = 0
+    movement = 1
     if inp == curses.KEY_DOWN:
-        ymod = 1
+        ymod = movement
     elif inp == curses.KEY_UP:
-        ymod = -1
+        ymod = -movement
     elif inp == curses.KEY_LEFT:
-        xmod = -1
+        xmod = -movement
     elif inp == curses.KEY_RIGHT:        
-        xmod = 1
+        xmod = movement
     elif inp == curses.KEY_END:        
         for o in objects:
             if int(distance(player,o)) == 1:
@@ -233,7 +229,7 @@ def keyboard_input(inp, player, m, cs, objects):
             for x in range(2):
                 guard = Creature(randint(0,MAP_WIDTH), randint(0,MAP_HEIGHT), "g", 5, mode="wander")
                 cs.append(guard)
-                coin = Object(randint(1,MAP_WIDTH),randint(1,MAP_HEIGHT),"$",11, "a coin", "oooh, a coin")
+                coin = Object(randint(player.x - 10, player.x + 10),randint(player.y - 10, player.y + 10),"$",11, "a coin", "oooh, a coin")
                 objects.append(coin)
 
 def wander(c):
