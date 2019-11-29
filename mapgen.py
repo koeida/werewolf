@@ -39,8 +39,11 @@ def forest(m, startx, starty , endx, endy):
  
 def mountains(m, startx, starty , endx, endy):
     test_dig = [[6 for x in range(endx - startx)] for y in range(endy - starty)]
-    gd = good_dig() 
-    stamp(startx,starty,gd,m)
+    gds = [(0,10),(10,332), (332,10),(325, 325)]
+    gds = list(map(lambda x: good_dig(*x), gds))
+    for gd in gds:
+        stamp(0,0,gd,test_dig,6)
+    stamp(startx,starty,test_dig,m)
         
 class Digger:
     pass
@@ -127,13 +130,13 @@ def dig(sx, sy, edible, eaten, death_rate, s_spawn_rate, m, speed, stop_count):
                     
                     
     
-def good_dig(edible=6, eaten=7):
+def good_dig(sx, sy, edible=6, eaten=7):
     while(True):
         test_dig = [[edible for x in range(333)] for y in range(333)]
 
         width, height = w_h(test_dig)
-        dig(width, int(height - 25), edible, eaten, 50, 50, test_dig, 2, 1500)
-        if edge_touch(test_dig, edible, eaten) >= 2:# and rate_dig(test_dig) <= width * height * 0.5:
+        dig(sx, sy, edible, eaten, 50, 50, test_dig, 2, 1500)
+        if edge_touch(test_dig, edible, eaten) >= 2: #and rate_dig(test_dig) <= width * height * 0.5:
             return test_dig
     
         
@@ -259,12 +262,13 @@ def gen_objects(m):
         objectz.append(junk)
     return objectz
 
-def stamp(x,y,s,m):
+def stamp(x,y,s,m,ignore=None):
     """Stamps s onto m at coordinates x,y"""
     for sy in range(len(s)):
         for sx in range(len(s[0])):
             if on_map(x + sx, y + sy, m):
-                m[y + sy][x + sx] = s[sy][sx]
+                if s[sy][sx] != ignore:
+                    m[y + sy][x + sx] = s[sy][sx]
                 
 def stamp_building(x,y,s,m):
     """Stamps building s onto m at coordinates x,y"""
